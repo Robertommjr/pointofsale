@@ -18,6 +18,9 @@ namespace Data.EntityConfig
                 .IsRequired()
                 .HasMaxLength(50);
 
+            Property(produto => produto.Preço)
+                .IsRequired();
+
             HasRequired(produto => produto.Categoria)
                 .WithMany(categoria => categoria.Produtos)
                 .HasForeignKey(produto => produto.CategoriaId);
