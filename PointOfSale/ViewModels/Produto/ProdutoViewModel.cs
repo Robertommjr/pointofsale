@@ -21,10 +21,18 @@ namespace PointOfSale.ViewModels.Produto
 
         [Required(ErrorMessage = "Informe o preço")]
         [Display(Name = "Preço")]
-        public decimal Preço { get; set; }
+        public decimal Preco { get; set; }
+
+        public int Quantidade { get; set; }
 
         public virtual CategoriaViewModel Categoria { get; set; }
+        public virtual IList<ProdutoViewModel> ProdutosViewModels { get; set; }
 
         public ICollection<SelectListItem> Categorias { get; set; }
+
+        public ProdutoViewModel()
+        {
+            this.Quantidade = 1;
+        }
     }
 }

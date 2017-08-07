@@ -8,7 +8,7 @@ namespace PointOfSale.Controllers
 {
     public class MetodosPagamentoController : Controller
     {
-        readonly MetodoPagamentoService _metodoPagamentoService = new MetodoPagamentoService();
+        private readonly MetodoPagamentoService _metodoPagamentoService = new MetodoPagamentoService();
 
         // GET: MetodosPagamento
         public ActionResult Index()

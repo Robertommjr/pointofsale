@@ -8,7 +8,7 @@ using Domain.Entities;
 
 namespace Data.EntityConfig
 {
-    class ProdutoConfig : EntityTypeConfiguration<Produto>
+    internal class ProdutoConfig : EntityTypeConfiguration<Produto>
     {
         public ProdutoConfig()
         {
@@ -18,7 +18,7 @@ namespace Data.EntityConfig
                 .IsRequired()
                 .HasMaxLength(50);
 
-            Property(produto => produto.Preço)
+            Property(produto => produto.Preco)
                 .IsRequired();
 
             HasRequired(produto => produto.Categoria)

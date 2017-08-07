@@ -7,7 +7,7 @@ namespace PointOfSale.Controllers
 {
     public class CategoriasController : Controller
     {
-        readonly CategoriaService _categoriaService = new CategoriaService();
+        private readonly CategoriaService _categoriaService = new CategoriaService();
 
         // GET: Categorias
         public ActionResult Index()

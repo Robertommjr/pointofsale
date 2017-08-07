@@ -16,7 +16,7 @@ namespace Domain.Entities
 
         public string Nome { get; set; }
 
-        public decimal Preço { get; set; }
+        public decimal Preco { get; set; }
 
         public virtual Categoria Categoria { get; set; }
     }

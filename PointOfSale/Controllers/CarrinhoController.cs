@@ -8,20 +8,19 @@ using Domain.Entities;
 using Newtonsoft.Json;
 using PointOfSale.ViewModels.Carrinho;
 using PointOfSale.ViewModels.Categoria;
-using PointOfSale.ViewModels.Home;
 using PointOfSale.ViewModels.MetodoPagamento;
 using PointOfSale.ViewModels.Produto;
 using Service.Services;
 
 namespace PointOfSale.Controllers
 {
-    public class HomeController : MapController
+    public class CarrinhoController : MapController
     {
         private readonly CategoriaService _categoriaService = new CategoriaService();
         private readonly ProdutoService _produtoService = new ProdutoService();
         private readonly MetodoPagamentoService _metodoPagamentoService = new MetodoPagamentoService();
 
-        public HomeController()
+        public CarrinhoController()
         {
             AutomMapperConfig = new MapperConfiguration(cfg =>
             {
@@ -31,43 +30,30 @@ namespace PointOfSale.Controllers
 
                 //Categoria
                 cfg.CreateMap<Categoria, CategoriaViewModel>();
+
+                //MetodoPagamento
+                cfg.CreateMap<MetodoPagamento, MetodoPagamentoViewModel>();
             });
             Mapper = AutomMapperConfig.CreateMapper();
         }
 
+        // GET: Categorias
         public ActionResult Index()
-        {            
+        {
             return View();
         }
 
-        public ActionResult About()
+        // GET: Categorias
+        public string BuscaProdutos(string produtosIds)
         {
-            ViewBag.Message = "Your application description page.";
+            CarrinhoViewModel carrinoViewModel = new CarrinhoViewModel();
 
-            return View();
-        }
+            var produtos = _produtoService.ObterTodosComCategoria().Where(p => produtosIds.Contains(p.GuidId.ToString()));
 
-        public ActionResult Contact()
-        {
-            ViewBag.Message = "Your contact page.";
+            carrinoViewModel.ProdutosViewModel = Mapper.Map<IEnumerable<Produto>, IList<ProdutoViewModel>>(produtos);
+            carrinoViewModel.MetodosPagamentoViewModel = Mapper.Map<IList<MetodoPagamento>, IList<MetodoPagamentoViewModel>>(_metodoPagamentoService.ObterTodos());
 
-            return View();
-        }
-
-        public string BuscaDados()
-        {
-            HomeViewModel homeViewModel =
-                new HomeViewModel
-                {
-                    CategoriasViewModel =
-                        Mapper.Map<IEnumerable<Categoria>, IList<CategoriaViewModel>>(_categoriaService.ObterTodos()
-                            .OrderBy(c => c.Nome)),
-                    ProdutosViewModel =
-                        Mapper.Map<IList<Produto>, IList<ProdutoViewModel>>(_produtoService.ObterTodosComCategoria())
-                };
-
-
-            return JsonConvert.SerializeObject(homeViewModel);
+            return JsonConvert.SerializeObject(carrinoViewModel);
         }
     }
 }

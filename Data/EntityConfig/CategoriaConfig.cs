@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Data.EntityConfig
 {
-    class CategoriaConfig : EntityTypeConfiguration<Categoria>
+    internal class CategoriaConfig : EntityTypeConfiguration<Categoria>
     {
         public CategoriaConfig()
         {

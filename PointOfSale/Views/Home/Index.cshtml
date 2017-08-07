@@ -1,31 +1,78 @@
-﻿@{
+﻿@model PointOfSale.ViewModels.Home.HomeViewModel
+
+@{
     ViewBag.Title = "Home Page";
 }
 
-<div class="jumbotron">
-    <h1>ASP.NET</h1>
-    <p class="lead">ASP.NET is a free web framework for building great Web sites and Web applications using HTML, CSS and JavaScript.</p>
-    <p><a href="https://asp.net" class="btn btn-primary btn-lg">Learn more &raquo;</a></p>
-</div>
+<div ng-controller="HomeController" ng-init="BuscaDados()">
+    <div class="row">
+        <h2 class="text-center">Veja nossa lista de produtos</h2>
+    </div>
 
-<div class="row">
-    <div class="col-md-4">
-        <h2>Getting started</h2>
-        <p>
-            ASP.NET MVC gives you a powerful, patterns-based way to build dynamic websites that
-            enables a clean separation of concerns and gives you full control over markup
-            for enjoyable, agile development.
-        </p>
-        <p><a class="btn btn-default" href="https://go.microsoft.com/fwlink/?LinkId=301865">Learn more &raquo;</a></p>
-    </div>
-    <div class="col-md-4">
-        <h2>Get more libraries</h2>
-        <p>NuGet is a free Visual Studio extension that makes it easy to add, remove, and update libraries and tools in Visual Studio projects.</p>
-        <p><a class="btn btn-default" href="https://go.microsoft.com/fwlink/?LinkId=301866">Learn more &raquo;</a></p>
-    </div>
-    <div class="col-md-4">
-        <h2>Web Hosting</h2>
-        <p>You can easily find a web hosting company that offers the right mix of features and price for your applications.</p>
-        <p><a class="btn btn-default" href="https://go.microsoft.com/fwlink/?LinkId=301867">Learn more &raquo;</a></p>
+    <div class="row">
+        <div class="col-md-2">
+            <div class="panel panel-default">
+                <div class="panel-heading">Categorias</div>
+                <div class="list-group">
+                    <a href="#" class="list-group-item" ng-click="MudaMostrarCategoria('')">Todas</a>
+                    <a href="#" class="list-group-item" ng-repeat="categoria in categorias" ng-click="MudaMostrarCategoria(categoria.Nome)">{{categoria.Nome}}</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-10">
+            <div ng-repeat="produto in produtos">
+                <div class="col-md-2 table-bordered" style="margin: 5px; padding: 5px;" ng-hide="Mostrar(produto.Categoria.Nome)">
+                    <div class="text-center" style="border-bottom: 1px #000 solid; font-weight: bold;">{{produto.Nome}}</div>
+                    <div class="text-center" style="border-bottom: 1px #000 solid">{{produto.Categoria.Nome}}</div>
+                    <div class="text-center">
+                        <p>
+                            R${{produto.Preco}}
+                        </p>
+                    </div>
+                    <div class="text-center">
+                        <button type="button" class="btn btn-success" ng-click="Adicionar(produto)">Adicionar no <i class="fa fa-cart-plus"></i></button>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
+<script>
+    app.controller("HomeController", ['$scope', '$http', function ($scope, $http, $window) {
+        $scope.produtos = [];
+        $scope.categorias = [];
+        $scope.mostrarCategoria = "";
+
+        $scope.BuscaDados = function () {
+            $http.get('@Url.Action("BuscaDados")').then(function successCallback(data) {
+                $scope.produtos = data.data.ProdutosViewModel;
+                $scope.categorias = data.data.CategoriasViewModel;
+            });
+        };
+
+        $scope.MudaMostrarCategoria = function (categoria) {
+            $scope.mostrarCategoria = categoria;
+        };
+
+        $scope.Mostrar = function(categoria) {
+            if ($scope.mostrarCategoria == "" || $scope.mostrarCategoria == categoria) {
+                return false;
+            } else {
+                return true;
+            }
+        };
+
+        $scope.Adicionar = function(produto) {
+            var prodCarrinho = JSON.parse(window.localStorage.getItem("Produtos"));
+
+            if (prodCarrinho == null) {
+                prodCarrinho = [];
+                prodCarrinho.push(produto.GuidId);
+            } else {
+                prodCarrinho.push(produto.GuidId);
+            }
+
+            window.localStorage.setItem("Produtos", JSON.stringify(prodCarrinho));
+        }
+    }]);
+</script>

@@ -8,7 +8,7 @@ using Domain.Entities;
 
 namespace Data.EntityConfig
 {
-    class MetodoPagamentoConfig : EntityTypeConfiguration<MetodoPagamento>
+    internal class MetodoPagamentoConfig : EntityTypeConfiguration<MetodoPagamento>
     {
         public MetodoPagamentoConfig()
         {
