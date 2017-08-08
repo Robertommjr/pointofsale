@@ -1,34 +1,22 @@
 ﻿@model Domain.Entities.MetodoPagamento
 
 @{
-    Layout = null;
+    ViewBag.Title = "Create";
 }
 
-<!DOCTYPE html>
+<h2>Create</h2>
 
-<html>
-<head>
-    <meta name="viewport" content="width=device-width" />
-    <title>Create</title>
-</head>
-<body>
-    @Scripts.Render("~/bundles/jquery")
-    @Scripts.Render("~/bundles/jqueryval")
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
 
-
-    @using (Html.BeginForm())
-    {
-        @Html.AntiForgeryToken()
-
-        <div class="form-horizontal">
-            <h4>MetodoPagamento</h4>
-            <hr />
-            @Html.Partial("_CreateOrEdit", Model)
-        </div>
-    }
-
-    <div>
-        @Html.ActionLink("Back to List", "Index")
+    <div class="form-horizontal">
+        <h4>MetodoPagamento</h4>
+        <hr />
+        @Html.Partial("_CreateOrEdit", Model)
     </div>
-</body>
-</html>
+}
+
+<div>
+    @Html.ActionLink("Back to List", "Index")
+</div>

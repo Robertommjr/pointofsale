@@ -36,7 +36,7 @@
                     <div class="text-center" style="border-bottom: 1px #000 solid">{{produto.Categoria.Nome}}</div>
                     <div class="text-center">
                         <p>
-                            R${{produto.Preco | number:2}}
+                            {{produto.Preco | currency: 'R$'}}
                         </p>
                     </div>
                     <div class="text-center">
