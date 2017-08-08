@@ -21,7 +21,7 @@ namespace PointOfSale.ViewModels.Produto
 
         [Required(ErrorMessage = "Informe o preço")]
         [Display(Name = "Preço")]
-        public decimal Preco { get; set; }
+        public Decimal Preco { get; set; }
 
         public int Quantidade { get; set; }
 

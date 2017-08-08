@@ -83,17 +83,26 @@ namespace PointOfSale.Controllers
         // more details see https://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create([Bind(Include = "GuidId,CategoriaId,Nome,Preço")] ProdutoViewModel produtovm)
+        public ActionResult Create([Bind(Include = "GuidId,CategoriaId,Nome,Preco")] ProdutoViewModel produtovm)
         {
             if (ModelState.IsValid)
             {
                 var produto = Mapper.Map<ProdutoViewModel, Produto>(produtovm);
                 produto.GuidId = Guid.NewGuid();
 
+                //produto.Preco = Decimal.Parse(produtovm.Preco.Replace(".", ","));
+
                 _produtoService.Salvar(produto);
 
                 return RedirectToAction("Index");
             }
+
+            produtovm.Categorias = _categoriaService.ObterTodos().OrderBy(c => c.Nome).Select(option =>
+                new SelectListItem
+                {
+                    Text = option.Nome,
+                    Value = option.GuidId.ToString()
+                }).ToList();
 
             return View(produtovm);
         }
