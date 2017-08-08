@@ -4,14 +4,24 @@
     ViewBag.Title = "Home Page";
 }
 
+<style>
+    .loader {
+        border: 16px solid #f3f3f3; /* Light grey */
+        border-top: 16px solid #3498db; /* Blue */
+        border-radius: 50%;
+        width: 120px;
+        height: 120px;
+        animation: spin 2s linear infinite;
+    }
+</style>
+
 <div ng-controller="HomeController" ng-init="BuscaDados()">
     <div class="row">
         <h2 class="text-center">Veja nossa lista de produtos</h2>
     </div>
-
     <div class="row">
         <div class="col-md-2">
-            <div class="panel panel-default">
+            <div class="panel panel-default" ng-show="categorias.length > 0">
                 <div class="panel-heading">Categorias</div>
                 <div class="list-group">
                     <a href="#" class="list-group-item" ng-click="MudaMostrarCategoria('')">Todas</a>
@@ -26,7 +36,7 @@
                     <div class="text-center" style="border-bottom: 1px #000 solid">{{produto.Categoria.Nome}}</div>
                     <div class="text-center">
                         <p>
-                            R${{produto.Preco}}
+                            R${{produto.Preco | number:2}}
                         </p>
                     </div>
                     <div class="text-center">
@@ -37,42 +47,55 @@
         </div>
     </div>
 </div>
-<script>
-    app.controller("HomeController", ['$scope', '$http', function ($scope, $http, $window) {
-        $scope.produtos = [];
-        $scope.categorias = [];
-        $scope.mostrarCategoria = "";
 
-        $scope.BuscaDados = function () {
-            $http.get('@Url.Action("BuscaDados")').then(function successCallback(data) {
-                $scope.produtos = data.data.ProdutosViewModel;
-                $scope.categorias = data.data.CategoriasViewModel;
-            });
-        };
+@section Scripts {
+    <script>
+        app.controller("HomeController",
+            [
+                '$scope', '$http', function($scope, $http, $window) {
+                    $scope.produtos = [];
+                    $scope.categorias = [];
+                    $scope.mostrarCategoria = "";
 
-        $scope.MudaMostrarCategoria = function (categoria) {
-            $scope.mostrarCategoria = categoria;
-        };
+                    $scope.BuscaDados = function() {
+                        $http.get('@Url.Action("BuscaDados")').then(function successCallback(data) {
+                            $scope.produtos = data.data.ProdutosViewModel;
+                            $scope.categorias = data.data.CategoriasViewModel;
+                        });
+                    };
 
-        $scope.Mostrar = function(categoria) {
-            if ($scope.mostrarCategoria == "" || $scope.mostrarCategoria == categoria) {
-                return false;
-            } else {
-                return true;
-            }
-        };
+                    $scope.MudaMostrarCategoria = function(categoria) {
+                        $scope.mostrarCategoria = categoria;
+                    };
 
-        $scope.Adicionar = function(produto) {
-            var prodCarrinho = JSON.parse(window.localStorage.getItem("Produtos"));
+                    $scope.Mostrar = function(categoria) {
+                        if ($scope.mostrarCategoria == "" || $scope.mostrarCategoria == categoria) {
+                            return false;
+                        } else {
+                            return true;
+                        }
+                    };
 
-            if (prodCarrinho == null) {
-                prodCarrinho = [];
-                prodCarrinho.push(produto.GuidId);
-            } else {
-                prodCarrinho.push(produto.GuidId);
-            }
+                    $scope.Adicionar = function(produto) {
+                        var prodCarrinho = JSON.parse(window.localStorage.getItem("Produtos"));
 
-            window.localStorage.setItem("Produtos", JSON.stringify(prodCarrinho));
-        }
-    }]);
-</script>
+                        if (prodCarrinho == null) {
+                            prodCarrinho = [];
+                            prodCarrinho.push(produto.GuidId);
+                        } else {
+                            if (prodCarrinho.indexOf(produto.GuidId) > -1) {
+                                alert("Produto já adicionado ao carrinho");
+                                return;
+                            } else {
+                                prodCarrinho.push(produto.GuidId);
+                            }
+                        }
+
+                        window.localStorage.setItem("Produtos", JSON.stringify(prodCarrinho));
+
+                        alert("Produto adicionado com sucesso!!");
+                    }
+                }
+            ]);
+    </script>
+}

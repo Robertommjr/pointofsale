@@ -26,21 +26,29 @@
                     </div>
                 </div>
             </div>
-            <div ng-repeat="produto in produtos">
+
+            <div class="col-md-12" ng-show="produtos.length == 0">
+                <div style="text-align: center; margin: 10px; padding: 10px 0 1px 0; background-color: lightyellow;">
+                    <p>Seu carrinho está vazio! @Html.ActionLink("Visite nossa loja", "Index", "Home"), temos o que você procura!</p>
+                </div>
+            </div>
+
+            <div ng-repeat="produto in produtos" ng-show="produtos.length > 0">
                 <div class="row table-bordered" style="margin: 5px;">
                     <div class="col-md-6">
                         <div class="text-left" style="font-weight: bold;">{{produto.Nome}}</div>
                         <div class="text-left">{{produto.Categoria.Nome}}</div>
                     </div>
-                    <div class="col-md-2 text-center">
+                    <div class="col-md-2 text-left">
                         <div style="margin: 7px 0 7px 0;">
                             Qtd.<input type="number" style="width: 45px;" min="0" ng-model="produto.Quantidade" />
+                            <a href="#" ng-click="Remover(produto)" style="font-size: 10px">Remover</a>
                         </div>
                     </div>
                     <div class="col-md-4">
                         <div style="margin: 10px 0 10px 0;">
-                            <div class="text-left" style="float: left;">Valor Unit. R${{produto.Preco}}</div>
-                            <div class="text-right" style="float: right;">Valor Tot. R${{produto.Preco * produto.Quantidade}}</div>
+                            <div class="text-left" style="float: left;">Valor Unit. R${{produto.Preco | number: 2}}</div>
+                            <div class="text-right" style="float: right;">Valor Tot. R${{produto.Preco * produto.Quantidade | number: 2}}</div>
                         </div>
                     </div>
                 </div>
@@ -48,7 +56,7 @@
             <div class="row table-bordered" style="margin: 5px;">
                 <div class="col-md-12">
                     <div class="text-right" style="font-weight: bold; margin: 10px 0 10px 0;">
-                        Total R${{total}}
+                        Total: {{total > 0 ? "R$ " + (total | number: 2) : "..."}}
                     </div>
                 </div>
             </div>
@@ -62,24 +70,63 @@
         </select><br>
     </div>
     <div class="row">
-        <button type="button" class="btn btn-success" style="float: right;">Finalizar Compra</button>
+        <button type="button" class="btn btn-success" style="float: right;" ng-click="FinalizarCompra()" ng-disabled="total <= 0">Finalizar Compra</button>
     </div>
 </div>
-<script>
-    app.controller("CarrinhoController", ['$scope', '$http', function ($scope, $http) {
-        $scope.titulo = "Produtos no seu carrinho";
-        $scope.produtos = [];
-        $scope.total = 100;
-        $scope.metodosPagamento = [];
 
-        $scope.BuscaProdutos = function () {
-            $http.get('@Url.Action("BuscaProdutos")', {
-                params: { produtosIds: window.localStorage.getItem("Produtos") }
-            }).then(function successCallback(data) {
-                $scope.produtos = data.data.ProdutosViewModel;
-                $scope.metodosPagamento = data.data.MetodosPagamentoViewModel;
-            });
-        };
-    }]);
-</script>
+@section Scripts {
+    <script>
+        app.controller("CarrinhoController",
+            [
+                '$scope', '$http', function($scope, $http) {
+                    $scope.titulo = "Produtos no seu carrinho";
+                    $scope.produtos = [];
+                    $scope.total = 0;
+                    $scope.metodosPagamento = [];
 
+                    $scope.BuscaProdutos = function() {
+                        $http.get('@Url.Action("BuscaProdutos")',
+                            {
+                                params: { produtosIds: window.localStorage.getItem("Produtos") }
+                            }).then(function successCallback(data) {
+                            $scope.produtos = data.data.ProdutosViewModel;
+
+                            $scope.total = 0;
+
+                            $scope.produtos.forEach(function(prod) {
+                                $scope.total += prod.Preco;
+                            });
+
+                            $scope.metodosPagamento = data.data.MetodosPagamentoViewModel;
+                        });
+                    };
+
+                    $scope.Remover = function(produto) {
+                        var prodCarrinho = JSON.parse(window.localStorage.getItem("Produtos"));
+
+                        if (prodCarrinho == null) {
+                            alert("O Carrinho está vazio");
+                            return;
+                        } else {
+                            if (prodCarrinho.indexOf(produto.GuidId) > -1) {
+                                prodCarrinho.splice(prodCarrinho.indexOf(produto.GuidId), 1);
+                            } else {
+                                alert("Produto não consta no carrinho");
+                                return;
+                            }
+                        }
+
+                        window.localStorage.setItem("Produtos", JSON.stringify(prodCarrinho));
+                        $scope.BuscaProdutos();
+                    }
+
+                    $scope.FinalizarCompra = function(produto) {
+                        window.localStorage.setItem("Produtos", "[]");
+                        alert("Compra realizada!! Agora é só aguardar!!");
+
+                        window.location = "@Url.Action("Index", "Home")";
+                    }
+                }
+            ]);
+    </script>
+}
